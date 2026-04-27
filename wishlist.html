@@ -9,6 +9,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { overflow-y: auto; }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            z-index: 1000;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+        }
+        .logo span { color: #3498db; }
+        header nav {
+            display: flex;
+            gap: 10px;
+            position: relative;
+        }
+        header nav a {
+            color: #949494;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: 0.3s;
+        }
+        header nav a:hover, header nav a.active { color: white; background: rgba(52,152,219,0.2); }
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            z-index: 1001;
+        }
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            header nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(26, 26, 46, 0.98);
+                flex-direction: column;
+                padding: 20px;
+            }
+            header nav.active { display: flex; }
+            header { padding: 15px 20px; }
+        }
         .page-header {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             padding: 150px 50px 80px;
@@ -54,9 +110,16 @@
 </head>
 
     <header>
-        <div class="logo"><span>Luxe</span>Estate</div>
+        <a href="index.html" class="logo"><span>Luxe</span>Estate</a>
         <nav>
             <a href="index.html">HOME</a>
+            <a href="index.html#properties">PROPERTIES</a>
+            <a href="index.html#services">SERVICES</a>
+            <a href="about.html">ABOUT</a>
+            <a href="contact.html">CONTACT</a>
+        </nav>
+        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
+    </header>
             <a href="index.html#properties">PROPERTIES</a>
             <a href="index.html#services">SERVICES</a>
             <a href="about.html">ABOUT</a>
@@ -166,6 +229,11 @@
         }
 
         loadWishlist();
+
+        // Mobile Menu Toggle
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('header nav').classList.toggle('active');
+        });
     </script>
 </body>
 </html>

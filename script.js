@@ -402,6 +402,50 @@ notificationStyles.textContent = `
     .modal-btn.call { background: #e74c3c; }
     .modal-btn.whatsapp { background: #25D366; }
     .modal-btn.contact { background: #3498db; }
+    .modal-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: #3498db;
+        padding: 8px 18px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+    }
+    .modal-description {
+        margin-bottom: 25px;
+        padding: 20px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 15px;
+    }
+    .modal-description h3 {
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+    .modal-description p {
+        color: #949494;
+        line-height: 1.7;
+    }
+    .modal-footer {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .modal-wishlist {
+        padding: 12px 25px;
+        background: rgba(231, 76, 60, 0.2);
+        border: 2px solid #e74c3c;
+        border-radius: 25px;
+        color: #e74c3c;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .modal-wishlist:hover {
+        background: #e74c3c;
+        color: white;
+    }
 `;
 document.head.appendChild(notificationStyles);
 
@@ -469,3 +513,109 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Make Property Cards Clickable
+document.querySelectorAll('.property-card').forEach(card => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(e) {
+        if (e.target.closest('.action-btn') || e.target.closest('.view-btn') || e.target.closest('button')) {
+            return;
+        }
+        const title = this.querySelector('.property-title') ? this.querySelector('.property-title').textContent : '';
+        const price = this.querySelector('.property-price') ? this.querySelector('.property-price').textContent : '';
+        const address = this.querySelector('.property-address') ? this.querySelector('.property-address').textContent : '';
+        const img = this.querySelector('.card-image img') ? this.querySelector('.card-image img').src : '';
+        const type = this.querySelector('.property-type') ? this.querySelector('.property-type').textContent : '';
+        
+        const features = [];
+        this.querySelectorAll('.property-features .feature span').forEach(f => features.push(f.textContent));
+        
+        openPropertyModal({ title, price, address, img, type, features }, this);
+    });
+});
+
+// Enhanced Open Property Modal
+const originalOpenPropertyModal = openPropertyModal;
+openPropertyModal = function(data, card) {
+    let title, price, address, img, type, features;
+    
+    if (card) {
+        title = card.querySelector('.property-title').textContent;
+        price = card.querySelector('.property-price').textContent;
+        address = card.querySelector('.property-address').textContent;
+        img = card.querySelector('.card-image img').src;
+        type = card.querySelector('.property-type') ? card.querySelector('.property-type').textContent : '';
+        features = [];
+        card.querySelectorAll('.property-features .feature span').forEach(f => features.push(f.textContent));
+    } else {
+        title = data.title;
+        price = data.price;
+        address = data.address;
+        img = data.img;
+        type = data.type;
+        features = data.features || [];
+    }
+    
+    const modal = document.createElement('div');
+    modal.className = 'property-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div class="modal-image">
+                <img src="${img}" alt="${title}">
+                <span class="modal-badge">${type}</span>
+            </div>
+            <div class="modal-details">
+                <h2>${title}</h2>
+                <p class="modal-price">${price}</p>
+                <p class="modal-address"><i class="fas fa-map-marker-alt"></i> ${address}</p>
+                <div class="modal-features">
+                    ${features.map(f => `<span><i class="fas fa-check"></i> ${f}</span>`).join('')}
+                </div>
+                <div class="modal-description">
+                    <h3>About This Property</h3>
+                    <p>This stunning ${type.toLowerCase()} offers exceptional value in a prime location. Featuring modern amenities, spacious rooms, and beautiful views. Perfect for families or investment purposes. Don't miss this opportunity to own a piece of luxury living.</p>
+                </div>
+                <div class="modal-actions">
+                    <a href="tel:+15551234567" class="modal-btn call"><i class="fas fa-phone"></i> Call Agent</a>
+                    <a href="https://wa.me/15551234567?text=Hi, I'm interested in ${encodeURIComponent(title)} (${price})" class="modal-btn whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <a href="contact.html" class="modal-btn contact"><i class="fas fa-envelope"></i> Contact</a>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-wishlist" onclick="toggleWishlistFromModal('${title}', '${price}', '${img}')">
+                        <i class="far fa-heart"></i> Add to Wishlist
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    
+    modal.querySelector('.modal-close').addEventListener('click', () => {
+        modal.remove();
+        document.body.style.overflow = '';
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+            document.body.style.overflow = '';
+        }
+    });
+};
+
+function toggleWishlistFromModal(title, price, img) {
+    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    const exists = wishlist.some(item => item.title === title);
+    
+    if (exists) {
+        const newWishlist = wishlist.filter(item => item.title !== title);
+        localStorage.setItem('wishlist', JSON.stringify(newWishlist));
+        showNotification('Removed from wishlist!', 'removed');
+    } else {
+        wishlist.push({ title, price, img, date: new Date().toISOString() });
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        showNotification('Added to wishlist!', 'success');
+    }
+}
