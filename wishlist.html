@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist - LuxeEstate</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { overflow-y: auto; }
+        .page-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 150px 50px 80px;
+            text-align: center;
+        }
+        .page-header h1 { font-size: 3rem; margin-bottom: 15px; }
+        .page-header p { color: #949494; font-size: 1.1rem; }
+        .wishlist-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .empty-wishlist {
+            text-align: center;
+            padding: 100px 20px;
+            color: #949494;
+        }
+        .empty-wishlist i { font-size: 4rem; margin-bottom: 20px; }
+        .empty-wishlist h2 { color: #fff; margin-bottom: 15px; }
+        .empty-wishlist a { color: #3498db; text-decoration: underline; }
+        .wishlist-item { position: relative; }
+        .remove-wishlist {
+            position: absolute;
+            top: 15px;
+            right: 55px;
+            z-index: 10;
+            width: 35px;
+            height: 35px;
+            background: rgba(231, 76, 60, 0.9);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .remove-wishlist:hover { background: #e74c3c; transform: scale(1.1); }
+    </style>
+</head>
+
+    <header>
+        <div class="logo"><span>Luxe</span>Estate</div>
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="index.html#properties">PROPERTIES</a>
+            <a href="index.html#services">SERVICES</a>
+            <a href="about.html">ABOUT</a>
+            <a href="contact.html">CONTACT</a>
+        </nav>
+        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
+    </header>
+
+    <div class="page-header">
+        <h1>My Wishlist</h1>
+        <p>Your saved properties</p>
+    </div>
+
+    <div class="wishlist-container">
+        <div class="wishlist-grid" id="wishlistGrid">
+            <!-- Wishlist items will be loaded here -->
+        </div>
+        <div class="empty-wishlist" id="emptyWishlist" style="display: none;">
+            <i class="far fa-heart"></i>
+            <h2>Your wishlist is empty</h2>
+            <p>Save properties you like by clicking the heart icon</p>
+            <br>
+            <a href="index.html#properties">Browse Properties</a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo"><span>Luxe</span>Estate</div>
+                    <p>Your trusted partner in finding luxury properties.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#properties">Properties</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="tel:+15551234567">+1 (555) 123-4567</a></li>
+                        <li><a href="mailto:info@luxeestate.com">info@luxeestate.com</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Follow Us</h4>
+                    <div class="footer-social">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 LuxeEstate. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <div class="floating-widget">
+        <a href="tel:+15551234567" class="widget-btn call-btn"><i class="fas fa-phone"></i></a>
+        <a href="https://wa.me/15551234567" class="widget-btn whatsapp-btn" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    </div>
+
+    <script>
+        const wishlistGrid = document.getElementById('wishlistGrid');
+        const emptyWishlist = document.getElementById('emptyWishlist');
+
+        function loadWishlist() {
+            const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            
+            if (wishlist.length === 0) {
+                wishlistGrid.style.display = 'none';
+                emptyWishlist.style.display = 'block';
+                return;
+            }
+            
+            wishlistGrid.style.display = 'grid';
+            emptyWishlist.style.display = 'none';
+            
+            wishlistGrid.innerHTML = wishlist.map((item, index) => `
+                <div class="property-card wishlist-item">
+                    <div class="card-image">
+                        <img src="${item.img}" alt="${item.title}">
+                        <span class="badge sale">Saved</span>
+                        <button class="remove-wishlist" onclick="removeFromWishlist(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="card-details">
+                        <p class="property-price">${item.price}</p>
+                        <h3 class="property-title">${item.title}</h3>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeFromWishlist(index) {
+            const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            wishlist.splice(index, 1);
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            loadWishlist();
+        }
+
+        loadWishlist();
+    </script>
+</body>
+</html>
